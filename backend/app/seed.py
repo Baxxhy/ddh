@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from backend.app.database import get_engine
 from backend.app.fixtures import SCENARIOS
-from backend.app.models import Base, ScenarioVersion
+from backend.app.models import ScenarioVersion
 
 
 def seed_scenarios(session: Session) -> int:
@@ -17,6 +17,8 @@ def seed_scenarios(session: Session) -> int:
                 version=item.version,
                 title=item.title,
                 summary=item.summary,
+                goal=item.goal,
+                simulation_notice=item.simulation_notice,
                 demo_data=item.demo_data,
                 sort_order=item.sort_order,
                 active=True,
@@ -28,9 +30,7 @@ def seed_scenarios(session: Session) -> int:
 
 
 def main() -> None:
-    engine = get_engine()
-    Base.metadata.create_all(engine)
-    with Session(engine) as session:
+    with Session(get_engine()) as session:
         count = seed_scenarios(session)
     print(f"场景初始化完成，新增 {count} 条演示场景。")
 

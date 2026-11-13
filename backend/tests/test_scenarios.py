@@ -63,3 +63,28 @@ def test_empty_database_returns_empty_list() -> None:
     finally:
         app.dependency_overrides.clear()
         generator.close()
+
+
+def test_health_detail_missing_and_database_values() -> None:
+    generator = make_session()
+    try:
+        session = next(generator)
+        seed_scenarios(session)
+        row = session.get(ScenarioVersion, ('hospital', '1.0'))
+        assert row is not None
+        row.goal = '数据库中修改后的练习目标'
+        session.commit()
+        def override_db() -> Iterator[Session]:
+            yield session
+        app.dependency_overrides[get_db] = override_db
+        with TestClient(app) as client:
+            assert client.get('/api/v1/health').json() == {'status': 'ok'}
+            for scene_id in ['hospital', 'bus', 'payment']:
+                result = client.get(f'/api/v1/scenarios/{scene_id}')
+                assert result.status_code == 200
+                assert result.json()['simulation_notice']
+            assert client.get('/api/v1/scenarios/hospital').json()['goal'] == row.goal
+            assert client.get('/api/v1/scenarios/missing').status_code == 404
+    finally:
+        app.dependency_overrides.clear()
+        generator.close()

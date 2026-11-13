@@ -1,6 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -10,11 +9,7 @@ from backend.app.database import get_db
 from backend.app.models import ScenarioVersion
 
 
-class ScenarioSummary(BaseModel):
-    id: str
-    title: str
-    summary: str
-    version: str
+from backend.app.schemas import ScenarioSummary, ScenarioDetail
 
 
 app = FastAPI(title="点点会 API", version="0.1.0")
@@ -26,7 +21,8 @@ app.add_middleware(
 )
 
 
-@app.get("/api/health")
+@app.get("/api/v1/health")
+@app.get("/api/health", include_in_schema=False)
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
@@ -42,6 +38,21 @@ def list_scenarios(db: Session = Depends(get_db)) -> list[ScenarioSummary]:
     except SQLAlchemyError as exc:
         raise HTTPException(status_code=503, detail="场景暂时无法加载，请稍后重试。") from exc
     return [
-        ScenarioSummary(id=row.scenario_id, title=row.title, summary=row.summary, version=row.version)
+        ScenarioSummary(id=row.scenario_id, title=row.title, summary=row.summary, goal=row.goal, version=row.version)
         for row in rows
     ]
+
+
+@app.get("/api/v1/scenarios/{scenario_id}", response_model=ScenarioDetail)
+def scenario_detail(scenario_id: str, db: Session = Depends(get_db)) -> ScenarioDetail:
+    try:
+        row = db.scalar(select(ScenarioVersion).where(
+            ScenarioVersion.scenario_id == scenario_id,
+            ScenarioVersion.active.is_(True),
+        ).order_by(ScenarioVersion.version.desc()))
+    except SQLAlchemyError as exc:
+        raise HTTPException(status_code=503, detail="场景暂时无法加载，请稍后重试。") from exc
+    if row is None:
+        raise HTTPException(status_code=404, detail="没有找到这个场景，请返回首页选择。")
+    return ScenarioDetail(id=row.scenario_id, title=row.title, summary=row.summary,
+                          goal=row.goal, version=row.version, simulation_notice=row.simulation_notice)
