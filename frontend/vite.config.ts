@@ -15,9 +15,9 @@ export default defineConfig(({ mode }) => {
       }
     },
   }],
-  preview: { host: env.VITE_HOST || '0.0.0.0', port: 5173, strictPort: true },
+  preview: { host: env.VITE_HOST || '::', port: 5173, strictPort: true },
   server: {
-    host: env.VITE_HOST || '0.0.0.0',
+    host: env.VITE_HOST || '::',
     port: 5173,
     strictPort: true,
     proxy: {
