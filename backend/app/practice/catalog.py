@@ -19,4 +19,3 @@ def demo_config(scenario: str) -> dict:
     if scenario == 'payment':
         return {'engineVersion': 2, 'merchants': [{'id': 'a', 'label': '演示商户 A'}, {'id': 'b', 'label': '演示商户 B'}], 'target': {'merchant': 'a', 'amount_fen': 1250}, 'task': '请向演示商户 A 支付 12.50 元模拟金额。', 'maxAmountFen': 100000}
     return {'engineVersion': 2, 'task': '请找到公交乘车码，对准虚拟扫码器后完成模拟扫码。'}
-
