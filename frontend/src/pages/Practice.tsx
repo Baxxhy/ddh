@@ -20,7 +20,6 @@ export function Practice() {
   {(error||state.feedback)&&<FeedbackMessage message={error||state.feedback!.message}/>}
   {busy&&<p role="status" className="loading-message">正在处理，请稍等…</p>}
   {state.result?<ResultSummary state={state}/>:<Screen state={state}/>}
-  <p className="simulation-notice">练习专用，不会发生真实业务</p>
   <PracticeNavigation state={state}/>
  </section>
 }

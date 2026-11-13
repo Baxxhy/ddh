@@ -3,10 +3,12 @@ test('真实接口、三个场景介绍与返回', async ({ page }) => {
   for (const [id, title] of [['hospital','医院挂号'],['bus','公交乘车码'],['payment','扫码支付']]) {
     await page.goto('/')
     await expect(page.locator('.scenario-item')).toHaveCount(3)
+    await expect(page.getByText(/安心练习|不涉及真实/)).toHaveCount(0)
     await page.locator(`a[href="/scenarios/${id}"]`).click()
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: '开始练习', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: '开始练习', exact: true })).toBeEnabled()
+    await expect(page.getByText(/不会产生真实|不会发生真实|不能用于真实/)).toHaveCount(0)
     await page.getByRole('link', { name: '返回首页' }).click()
     await expect(page.locator('.scenario-item')).toHaveCount(3)
   }

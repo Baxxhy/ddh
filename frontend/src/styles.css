@@ -226,19 +226,6 @@ p {
   --scene:#9a5c00;
   --scene-bg:#fff2de;
 }
-.home-note {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  font-size:1.125rem;
-  color:var(--muted);
-  margin-top:28px;
-  line-height:1.5;
-}
-.home-note svg {
-  flex-shrink:0;
-}
 .intro-panel {
   flex:1;
   display:flex;
@@ -271,21 +258,6 @@ p {
 }
 .intro-goal {
   font-weight:bold;
-}
-.detail-notice {
-  display:flex;
-  align-items:flex-start;
-  gap:12px;
-  padding:18px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:16px;
-  color:var(--muted);
-}
-.detail-notice svg {
-  flex-shrink:0;
-  color:var(--primary);
-  margin-top:5px;
 }
 .intro-bottom {
   margin-top:auto;
@@ -622,12 +594,6 @@ p {
 .demo-code span {
   font-size:1.125rem;
 }
-.pass-caption {
-  text-align:center;
-  font-size:1.125rem;
-  color:var(--muted);
-  padding:8px 16px 24px;
-}
 .bus-pass-heading {
   display:flex;
   align-items:center;
@@ -766,13 +732,6 @@ p {
   padding:16px;
   border-radius:14px;
   background:var(--info-bg);
-}
-.simulation-notice {
-  font-size:1.125rem;
-  line-height:1.5;
-  text-align:center;
-  color:var(--muted);
-  margin:24px 0 16px;
 }
 .practice-navigation {
   padding:16px 0 4px;

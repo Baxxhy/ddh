@@ -32,5 +32,5 @@ export function PracticeNavigation({state}: {state:PracticeState}) {
 }
 export function ResultSummary({state}: {state:PracticeState}) {
  if(!state.result)return null
- return <section className={`result-summary ${state.scenarioId}`} aria-label="本次模拟结果"><div className="result-icon"><CheckCircle2 size={40} aria-hidden="true"/></div><h2>{sceneNames[state.scenarioId]}练习已完成</h2>{state.scenarioId==='payment'&&<p className="result-amount">{state.selectedSummary['模拟金额']}</p>}<p role="status">{state.result.message}</p>{state.scenarioId==='bus'?<div className="task-box"><p>已找到公交乘车码，并完成对准虚拟扫码器的操作。</p></div>:<SelectedSummary state={state}/>}</section>
+ return <section className={`result-summary ${state.scenarioId}`} aria-label="本次模拟结果"><div className="result-icon"><CheckCircle2 size={40} aria-hidden="true"/></div><h2>{sceneNames[state.scenarioId]}练习已完成</h2>{state.scenarioId==='payment'&&<p className="result-amount">{state.selectedSummary['模拟金额']}</p>}<p role="status">{state.title}</p>{state.scenarioId==='bus'?<div className="task-box"><p>已找到公交乘车码，并完成对准虚拟扫码器的操作。</p></div>:<SelectedSummary state={state}/>}</section>
 }

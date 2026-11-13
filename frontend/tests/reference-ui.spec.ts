@@ -17,5 +17,5 @@ test('页面数字键盘、删除、清空和系统键盘切换',async({page})=>
  await page.getByRole('button',{name:'使用系统键盘',exact:true}).click();await expect(amount).toHaveAttribute('inputmode','decimal');await expect(page.getByRole('group',{name:'数字键盘'})).toHaveCount(0)
  await page.getByRole('button',{name:'使用页面键盘',exact:true}).click();await expect(page.getByRole('group',{name:'数字键盘'})).toBeVisible()
  for(const name of ['数字 1','数字 2','小数点','数字 5','数字 0','核对付款信息','确认模拟付款'])await page.getByRole('button',{name,exact:true}).click()
- await expect(page.getByRole('status')).toContainText('没有发生真实资金交易')
+ await expect(page.getByRole('status')).toContainText('模拟支付成功')
 })

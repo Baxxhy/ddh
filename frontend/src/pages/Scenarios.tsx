@@ -4,7 +4,6 @@ import { ArrowLeft, CircleAlert, FileSearch } from 'lucide-react'
 import { loadScenarios, type Scenario } from '../api/scenarios'
 import { ScenarioTile } from '../components/ScenarioTile'
 import { ScenarioIntro } from '../components/ScenarioIntro'
-import { ShieldCheck } from 'lucide-react'
 import { ActionButton } from '../components/ActionButton'
 type State = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; rows: Scenario[] }
 export function Scenarios() {
@@ -25,6 +24,5 @@ export function Scenarios() {
   {state.status==='error'&&<div className="state-panel connection-state" role="alert"><CircleAlert size={64} aria-hidden="true"/><h2>暂时无法加载</h2><p>{state.message}</p><ActionButton onClick={()=>{setState({status:'loading'});setAttempt(x=>x+1)}}>重新加载</ActionButton></div>}
   {state.status==='ready'&&!state.rows.length&&<div className="empty-state"><FileSearch size={64} aria-hidden="true"/><p className="state-message" role="status">目前没有可显示的练习场景。</p></div>}
   {state.status==='ready'&&(id?state.rows.map(row=><ScenarioIntro key={row.id} scenario={row}/>):<ul className="scenario-list" aria-label="练习场景">{state.rows.map(row=><li key={row.id}><ScenarioTile scenario={row}/></li>)}</ul>)}
-  {!id&&<p className="home-note"><ShieldCheck size={20} aria-hidden="true"/>安心练习，不涉及真实预约和付款</p>}
  </>
 }
