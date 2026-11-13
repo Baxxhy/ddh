@@ -100,3 +100,15 @@ a:focus-visible, button:focus-visible { outline: 3px solid #915d10; outline-offs
 .detail p, main > p { font-size: 1.25rem; line-height: 1.6; }
 .detail h2 { font-size: 1.5rem; line-height: 1.4; margin-top: 2rem; }
 .detail .coming-soon { border-top: 1px solid #cbd7cb; padding-top: 1.5rem; margin-top: 2rem; }
+
+.practice-actions { display: grid; gap: 16px; margin-block: 1.5rem; }
+.practice-actions [role="group"], .practice-actions form { display: grid; gap: 16px; }
+.practice-actions button { min-height: 60px; width: 100%; border: 1px solid #315f48; border-radius: 12px; padding: 14px; font: inherit; font-size: 1.25rem; line-height: 1.5; color: #1d2c25; background: #fff; cursor: pointer; overflow-wrap: anywhere; }
+.practice-actions button:disabled { opacity: .6; cursor: wait; }
+.practice-actions input { width: 100%; min-width: 0; min-height: 60px; font: inherit; font-size: 1.375rem; border: 2px solid #315f48; border-radius: 8px; padding: 12px; }
+.practice p, .practice dt, .practice dd, .practice-actions label { font-size: 1.25rem; line-height: 1.6; }
+.practice dd { margin: 0 0 1rem; font-weight: bold; }
+.practice dl { border-block: 1px solid #cbd7cb; padding-block: 1rem; }
+.simulation-badge, .simulation-notice { color: #405b4c; }
+.demo-code { border: 3px dashed #315f48; text-align: center; padding: 20px; margin-block: 20px; }
+h1:focus { outline: none; }

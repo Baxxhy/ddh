@@ -1,10 +1,12 @@
 import { defineConfig, loadEnv } from 'vite'
+import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '..', '')
   return {
   envDir: '..',
+  resolve: { alias: [{ find: /^@tarojs\/components$/, replacement: fileURLToPath(new URL('./src/components/taro-h5.ts', import.meta.url)) }] },
   plugins: [react(), {
     name: 'require-frontend-port-5173',
     configResolved(config) {

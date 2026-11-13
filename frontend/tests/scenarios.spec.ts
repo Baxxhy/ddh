@@ -5,8 +5,8 @@ test('真实接口、三个场景介绍与返回', async ({ page }) => {
     await expect(page.locator('.scenario-item')).toHaveCount(3)
     await page.locator(`a[href="/scenarios/${id}"]`).click()
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
-    await expect(page.getByText('练习功能即将开放')).toBeVisible()
-    await expect(page.getByRole('button', { name: '开始练习' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: '开始练习', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: '开始练习', exact: true })).toBeEnabled()
     await page.getByRole('link', { name: '返回首页' }).click()
     await expect(page.locator('.scenario-item')).toHaveCount(3)
   }
@@ -35,6 +35,6 @@ for (const width of [360,390,430,1280]) test(`布局 ${width}`, async ({ page })
     for (const link of await page.locator('.scenario-item').all()) expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(60)
   }
   await page.locator('.scenario-item').first().click()
-  await expect(page.getByText('练习功能即将开放')).toBeVisible()
+  await expect(page.getByRole('button', { name: '开始练习', exact: true })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy()
 })
