@@ -14,7 +14,7 @@ from backend.app.database import get_db, get_engine
 from backend.app.main import app
 from backend.app.models import PracticeSession, ScenarioVersion, ScenarioCurrent
 from backend.app.practice import service
-from backend.app.seed import seed_scenarios, seed_practice
+from backend.app.seed import seed_scenarios, seed_practice, PRACTICE_VERSION
 from test_engine import PATHS
 
 pytestmark = pytest.mark.skipif(os.getenv('DDH_MYSQL_TEST') != '1', reason='Set DDH_MYSQL_TEST=1 for the dedicated MySQL test database')
@@ -63,7 +63,7 @@ def test_real_mysql_paths_and_closed_sessions(client,mysql,scene):
  state=move(client,headers,state,PATHS[scene][-1][0],expected=422)
  with Session(mysql) as db:
   row=db.scalar(select(PracticeSession).where(PracticeSession.token_hash==sha256(headers['X-Practice-Session'].encode()).hexdigest()))
-  assert row and row.result_json and row.scenario_version=='2.0'
+  assert row and row.result_json and row.scenario_version==PRACTICE_VERSION
  revision=state['revision']
  response=client.post('/api/v1/practice/restart',headers=headers,json={'revision':revision})
  assert response.status_code==200
@@ -120,7 +120,7 @@ def test_concurrent_confirmation_single_result(client,mysql):
 def test_explicit_current_and_pinned_history(client,mysql):
  headers,state=create(client,'hospital')
  with Session(mysql) as db:
-  original=db.get(ScenarioVersion,('hospital','2.0'))
+  original=db.get(ScenarioVersion,('hospital',PRACTICE_VERSION))
   for version in ['2.9','2.10']:
    if not db.get(ScenarioVersion,('hospital',version)):
     db.add(ScenarioVersion(scenario_id='hospital',version=version,title=original.title,summary=original.summary,goal=original.goal,simulation_notice=original.simulation_notice,demo_data=original.demo_data,sort_order=1,active=True))
@@ -129,9 +129,9 @@ def test_explicit_current_and_pinned_history(client,mysql):
   rows=client.get('/api/v1/scenarios').json()
   assert len(rows)==3 and next(x for x in rows if x['id']=='hospital')['version']=='2.10'
   assert client.get('/api/v1/scenarios/hospital').json()['version']=='2.10'
-  assert client.get('/api/v1/practice/state',headers=headers).json()['scenarioVersion']=='2.0'
+  assert client.get('/api/v1/practice/state',headers=headers).json()['scenarioVersion']==PRACTICE_VERSION
  finally:
-  with Session(mysql) as db:db.get(ScenarioCurrent,'hospital').version='2.0';db.commit()
+  with Session(mysql) as db:db.get(ScenarioCurrent,'hospital').version=PRACTICE_VERSION;db.commit()
 
 
 def test_invalid_contract_and_foreign_options(client):
@@ -146,3 +146,17 @@ def test_invalid_contract_and_foreign_options(client):
  state=move(client,headers,state,'select_doctor','a-internal-general')
  move(client,headers,state,'select_slot','a-internal-special-am',422)
  assert client.get('/api/v1/practice/state',headers=headers).json()['revision']==state['revision']
+
+
+def test_lesson_api_is_read_only_and_new_practice_is_empty(client,mysql):
+ from sqlalchemy import func
+ with Session(mysql) as db:before=db.scalar(select(func.count()).select_from(PracticeSession))
+ for scene,count in [('hospital',6),('bus',5),('payment',5)]:
+  response=client.get(f'/api/v1/scenarios/{scene}/lesson')
+  assert response.status_code==200 and len(response.json()['steps'])==count
+  assert response.json()['version']==PRACTICE_VERSION
+ with Session(mysql) as db:assert db.scalar(select(func.count()).select_from(PracticeSession))==before
+ assert client.get('/api/v1/scenarios/missing/lesson').status_code==404
+ _,state=create(client,'hospital')
+ assert state['nodeId']=='H0' and state['revision']==0 and state['selections']=={}
+ assert '青禾医院' in state['task']

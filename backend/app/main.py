@@ -66,6 +66,8 @@ def scenario_detail(scenario_id: str, db: Session = Depends(get_db)) -> Scenario
 
 
 app.include_router(practice_router)
+from backend.app.practice.lesson import router as lesson_router
+app.include_router(lesson_router)
 
 
 @app.exception_handler(PracticeError)

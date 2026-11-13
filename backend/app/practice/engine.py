@@ -8,7 +8,7 @@ class RuleError(ValueError):
 
 
 START = {'hospital': 'H0', 'bus': 'B0', 'payment': 'P0'}
-TITLES = dict(H0='模拟医疗服务', H1='选择医院', H2='选择科室', H3='选择门诊', H4='选择就诊时间', H5='核对预约信息', H6='模拟预约成功', HX='其他医疗服务', B0='模拟生活服务', B1='出行服务', B2='选择交通类型', B3='公交服务', B4='模拟公交乘车码', B6='模拟乘车成功', BM='模拟地铁服务', BX='其他生活服务', P0='模拟支付应用', P1='选择演示收款码', P2='查看收款方', P3='输入模拟金额', P4='核对付款信息', P5='模拟支付成功', PX='其他支付服务')
+TITLES = dict(H0='模拟医疗服务', H1='选择医院', H2='选择科室', H3='选择门诊', H4='选择就诊时间', H5='核对预约信息', H6='模拟预约成功', HX='其他医疗服务', B0='模拟生活服务', B1='出行服务', B2='选择交通类型', B3='公交服务', B4='模拟公交乘车码', B6='模拟乘车成功', BM='模拟地铁服务', BX='其他生活服务', P0='模拟支付应用', P1='选择收款码', P2='查看收款方', P3='输入模拟金额', P4='核对付款信息', P5='模拟支付成功', PX='其他支付服务')
 NOTICES = {'hospital': '模拟预约成功，没有产生真实挂号记录。', 'bus': '模拟乘车成功，没有产生真实乘车记录或扣费。', 'payment': '模拟支付成功，没有发生真实资金交易。'}
 
 
@@ -51,7 +51,7 @@ def actions(scenario: str, state: dict, config: dict) -> list[dict]:
     if node in ['H1','H2','H3','H4']:
         key = ['hospital','department','doctor','slot'][int(node[1])-1]
         return [button('select_'+key, TITLES[node], hospital_options(config, selected, key))]
-    if node == 'P1': return [button('scan_demo_code', '选择演示收款码', config['merchants'])]
+    if node == 'P1': return [button('scan_demo_code', '选择收款码', config['merchants'])]
     if node == 'P3': return [button('set_amount', '核对付款信息', input=True)]
     return [button(id, label) for id, label in fixed.get(node, [])]
 

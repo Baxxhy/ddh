@@ -33,18 +33,21 @@ def seed_scenarios(session: Session) -> int:
     return added
 
 
+PRACTICE_VERSION = '2.1'
+
+
 def seed_practice(session: Session) -> int:
     from backend.app.practice.catalog import demo_config
     added = 0
     for item in SCENARIOS:
-        if session.get(ScenarioVersion, (item.scenario_id, '2.0')) is not None:
+        if session.get(ScenarioVersion, (item.scenario_id, PRACTICE_VERSION)) is not None:
             continue
         config = demo_config(item.scenario_id)
-        session.add(ScenarioVersion(scenario_id=item.scenario_id, version='2.0', title=item.title, summary=item.summary, goal=config['task'], simulation_notice=item.simulation_notice, demo_data=config, sort_order=item.sort_order, active=True))
+        session.add(ScenarioVersion(scenario_id=item.scenario_id, version=PRACTICE_VERSION, title=item.title, summary=item.summary, goal=config['task'], simulation_notice=item.simulation_notice, demo_data=config, sort_order=item.sort_order, active=True))
         session.flush()
         current = session.get(ScenarioCurrent, item.scenario_id)
-        if current is None: session.add(ScenarioCurrent(scenario_id=item.scenario_id, version='2.0'))
-        else: current.version = '2.0'
+        if current is None: session.add(ScenarioCurrent(scenario_id=item.scenario_id, version=PRACTICE_VERSION))
+        elif current.version in {'1.0','2.0'}: current.version = PRACTICE_VERSION
         added += 1
     session.commit()
     return added
