@@ -1,19 +1,20 @@
+import { startPractice } from './helpers/learning'
 import { test, expect, type Page } from '@playwright/test'
 async function click(page: Page,name: string) { await page.getByRole('button',{name,exact:true}).click() }
-async function start(page:Page,id:string){await page.goto(`/scenarios/${id}`);await click(page,'开始练习');await expect(page.locator('.practice')).toBeVisible()}
-async function hospital(page:Page){for(const label of ['演示医院 A','内科','普通门诊','演示时段 A（周一上午）'])await click(page,label)}
+async function start(page:Page,id:string){await startPractice(page,id)}
+async function hospital(page:Page){for(const label of ['青禾医院','内科','普通门诊','周一上午 09:00–09:30'])await click(page,label)}
 async function amount(page:Page,value:string){await page.getByLabel('模拟金额（元）').fill(value);await click(page,'核对付款信息')}
 test('医院：探索、选错、修改、返回、成功、再练及退出',async({page})=>{
  await start(page,'hospital')
  await click(page,'查看其他医疗服务');await expect(page.getByRole('heading',{name:'其他医疗服务'})).toBeVisible();await click(page,'返回上一步')
  await click(page,'预约挂号')
- for(const label of ['演示医院 B','外科','专科门诊','演示时段 B（周一下午）'])await click(page,label)
+ for(const label of ['安和医院','外科','专科门诊','周一下午 14:00–14:30'])await click(page,label)
  await click(page,'确认模拟预约');await expect(page.getByRole('alert')).toContainText('不符')
  await click(page,'修改医院');await hospital(page)
- await click(page,'修改科室');await click(page,'内科');await click(page,'普通门诊');await click(page,'演示时段 A（周一上午）')
- await click(page,'修改门诊');await click(page,'普通门诊');await click(page,'演示时段 A（周一上午）')
- await click(page,'修改时间');await click(page,'演示时段 B（周一下午）');await click(page,'确认模拟预约');await expect(page.getByRole('alert')).toContainText('不符')
- await click(page,'返回上一步');await click(page,'演示时段 A（周一上午）');await click(page,'确认模拟预约')
+ await click(page,'修改科室');await click(page,'内科');await click(page,'普通门诊');await click(page,'周一上午 09:00–09:30')
+ await click(page,'修改门诊');await click(page,'普通门诊');await click(page,'周一上午 09:00–09:30')
+ await click(page,'修改时间');await click(page,'周一下午 14:00–14:30');await click(page,'确认模拟预约');await expect(page.getByRole('alert')).toContainText('不符')
+ await click(page,'返回上一步');await click(page,'周一上午 09:00–09:30');await click(page,'确认模拟预约')
  await expect(page.getByRole('status')).toContainText('模拟预约成功')
  await click(page,'再练一次');await expect(page.getByRole('button',{name:'预约挂号',exact:true})).toBeVisible()
  await click(page,'退出练习');await expect(page.locator('.scenario-item')).toHaveCount(3)
@@ -29,10 +30,10 @@ test('公交：其他服务、地铁、未对准、重试与完成',async({page}
 })
 test('支付：其他入口、错误商户、非法金额、修改后完成',async({page})=>{
  await start(page,'payment');await click(page,'查看其他支付服务');await click(page,'返回上一步');await click(page,'扫一扫')
- await click(page,'演示商户 B');await click(page,'确认收款方，填写金额')
+ await click(page,'邻里水果店');await click(page,'确认收款方，填写金额')
  for(const value of ['','abc','-1','0','1.999','999999.99']) {await amount(page,value);await expect(page.getByRole('alert')).toBeVisible()}
  await amount(page,'12.50');await click(page,'确认模拟付款');await expect(page.getByRole('alert')).toContainText('不符')
- await click(page,'更换商户');await click(page,'演示商户 A');await click(page,'确认收款方，填写金额')
+ await click(page,'更换商户');await click(page,'晨光便利店');await click(page,'确认收款方，填写金额')
  await expect(page.getByLabel('模拟金额（元）')).toHaveValue('')
  await amount(page,'1.00');await click(page,'确认模拟付款');await expect(page.getByRole('alert')).toContainText('不符')
  await click(page,'修改金额');await amount(page,'12.50');await click(page,'确认模拟付款')

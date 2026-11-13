@@ -1,10 +1,8 @@
 import { useNavigate } from 'react-router'
 import type { Scenario } from '../api/scenarios'
-import { usePractice } from './PracticeProvider'
 import { ActionButton } from './ActionButton'
-import { FeedbackMessage } from './FeedbackMessage'
 import { ScenarioIcon } from './ScenarioIcon'
 export function ScenarioIntro({scenario}: {scenario:Scenario}) {
- const {begin,busy,error}=usePractice(),navigate=useNavigate()
- return <div className={`intro-panel ${scenario.id}`}><div className="intro-hero"><div className="intro-pict"><ScenarioIcon id={scenario.id}/></div><p className="intro-title">{scenario.title}</p><p className="intro-goal">{scenario.goal}</p></div>{error&&<FeedbackMessage message={error}/>}<div className="intro-bottom"><ActionButton variant="primary" disabled={busy} onClick={async()=>{if(await begin(scenario.id))navigate(`/practice/${scenario.id}`)}}>开始练习</ActionButton>{busy&&<p role="status">正在准备练习…</p>}</div></div>
+ const navigate=useNavigate()
+ return <div className={`intro-panel ${scenario.id}`}><div className="intro-hero"><div className="intro-pict"><ScenarioIcon id={scenario.id}/></div><p className="intro-title">{scenario.title}</p><p className="intro-goal">{scenario.goal}</p></div><div className="intro-bottom"><p className="learning-order">1 看教学 → 2 自己练习</p><ActionButton variant="primary" onClick={()=>navigate(`/learn/${scenario.id}`)}>开始教学</ActionButton></div></div>
 }

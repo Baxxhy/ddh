@@ -1,5 +1,6 @@
+import { completeLesson, startPractice } from './helpers/learning'
 import { test, expect, type Page } from '@playwright/test'
-const journeys:Record<string,string[]>={hospital:['预约挂号','演示医院 A','内科','普通门诊','演示时段 A（周一上午）','确认模拟预约'],bus:['出行','交通服务','公交','公交乘车码','对准虚拟扫码器，模拟扫码'],payment:['扫一扫','演示商户 A','确认收款方，填写金额','核对付款信息','确认模拟付款']}
+const journeys:Record<string,string[]>={hospital:['预约挂号','青禾医院','内科','普通门诊','周一上午 09:00–09:30','确认模拟预约'],bus:['出行','交通服务','公交','公交乘车码','对准虚拟扫码器，模拟扫码'],payment:['扫一扫','晨光便利店','确认收款方，填写金额','核对付款信息','确认模拟付款']}
 async function button(page:Page,name:string){
  if(name==='大字'){await page.getByRole('button',{name,exact:true}).click();return}
  const response=page.waitForResponse(response=>response.url().includes('/practice/')&&response.request().method()==='POST')
@@ -8,7 +9,7 @@ async function button(page:Page,name:string){
  const state=body.state||body
  if(state.title){await expect(page.getByRole('heading',{level:1})).toHaveText(state.title);await expect(page.getByRole('heading',{level:1})).toBeFocused()}
 }
-async function start(page:Page,id:string){await page.goto(`/scenarios/${id}`);await button(page,'开始练习');await expect(page.locator('.practice')).toBeVisible()}
+async function start(page:Page,id:string){await startPractice(page,id)}
 async function layout(page:Page){
  await expect(page.locator('.practice')).toHaveAttribute('aria-busy','false')
  await expect(page.getByRole('heading',{level:1})).toBeFocused()
@@ -21,8 +22,9 @@ for(const width of [360,390,430,768,1280])for(const mode of ['normal','large','2
  if(mode==='large')await button(page,'大字')
  if(mode==='200%')await page.evaluate(()=>{document.documentElement.style.fontSize='200%'})
  await page.locator(`a[href="/scenarios/${scene}"]`).click()
- await expect(page.getByRole('button',{name:'开始练习',exact:true})).toBeVisible()
+ await expect(page.getByRole('button',{name:'开始教学',exact:true})).toBeVisible()
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy()
+ await page.getByRole('button',{name:'开始教学',exact:true}).click();await completeLesson(page)
  await button(page,'开始练习')
  for(const label of journeys[scene]){
   await layout(page)
@@ -30,7 +32,7 @@ for(const width of [360,390,430,768,1280])for(const mode of ['normal','large','2
   await button(page,label)
  }
  await layout(page);await expect(page.getByRole('status')).toContainText('模拟')
- if(scene==='hospital')await expect(page.locator('.result-summary')).toContainText('演示医院 A')
+ if(scene==='hospital')await expect(page.locator('.result-summary')).toContainText('青禾医院')
  if(scene==='payment')await expect(page.locator('.result-summary')).toContainText('12.50')
  await page.screenshot({path:`/tmp/ddh-stage3-${scene}-${width}-${mode}.png`,fullPage:true})
  await button(page,'返回首页');await expect(page.locator('.scenario-item')).toHaveCount(3)
@@ -45,6 +47,7 @@ async function keyboardButton(page:Page,name:string){
 }
 for(const scene of Object.keys(journeys))test(`${scene} 键盘完成主要流程`,async({page})=>{
  await page.goto(`/scenarios/${scene}`);await expect(page.getByRole('heading',{level:1})).toBeFocused()
+ await keyboardButton(page,'开始教学');await completeLesson(page,name=>keyboardButton(page,name))
  await keyboardButton(page,'开始练习')
  for(const label of journeys[scene]){
   await expect(page.getByRole('heading',{level:1})).toBeFocused()
@@ -59,13 +62,13 @@ for(const scene of Object.keys(journeys))test(`${scene} 键盘完成主要流程
 })
 test('同值重选后的连续返回与探索支路进度',async({page})=>{
  await start(page,'hospital');for(const label of journeys.hospital.slice(0,-1))await button(page,label)
- await button(page,'修改医院');await button(page,'演示医院 A');await button(page,'返回上一步')
+ await button(page,'修改医院');await button(page,'青禾医院');await button(page,'返回上一步')
  await expect(page.getByRole('heading',{level:1})).toHaveText('选择医院')
  await button(page,'返回上一步');await expect(page.getByRole('heading',{level:1})).toHaveText('模拟医疗服务')
  await button(page,'退出练习');await start(page,'payment')
  for(const label of journeys.payment.slice(0,3))await button(page,label)
  await page.getByLabel('模拟金额（元）').fill('12.50');await button(page,'核对付款信息')
- await button(page,'更换商户');await button(page,'演示商户 A');await button(page,'返回上一步');await button(page,'返回上一步')
+ await button(page,'更换商户');await button(page,'晨光便利店');await button(page,'返回上一步');await button(page,'返回上一步')
  await expect(page.getByRole('heading',{level:1})).toHaveText('模拟支付应用')
  await button(page,'退出练习');await start(page,'bus');await button(page,'出行');await button(page,'交通服务');await button(page,'地铁')
  await expect(page.getByRole('progressbar')).toHaveCount(0)
