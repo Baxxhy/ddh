@@ -32,9 +32,9 @@
 项目目标技术栈：React、TypeScript、Vite、Python、FastAPI、MySQL，结合 RAG 知识库与 LangGraph Agent。模型和 API Key 由项目负责人提供。练习使用模拟数据，明确区分模拟结果与真实业务结果。
 
 - 优先选用成熟、稳定、维护活跃的开源方案。
-- UI 组件优先 shadcn/ui（Nova 风格）；图标优先 Lucide；确有需要时使用 Motion、react-resizable-panels、dnd-kit、Zustand。
+- React UI 组件统一采用 **Taro UI for React**；图标优先 Lucide；确有需要时使用 Motion、react-resizable-panels、dnd-kit、Zustand。
 - 仅在功能需要时引入依赖，优先复用已有组件和框架原生能力，不引入重叠组件库。
-- shadcn/ui 源码保持可控并统一定制；不擅自升级或替换核心依赖。
+- Taro UI for React 组件统一定制并满足适老化规范；接入前验证与现有 React + TypeScript + Vite 工程的兼容性，不擅自更换构建框架或升级核心依赖。
 - 若已有项目架构与上述建议不同，以现有架构为准，重大调整先确认。
 
 ## 5. 工程架构与代码质量
@@ -53,10 +53,12 @@
 
 - 以 Awwwards、Webby Awards、FWA 的优秀作品为视觉参考，追求专业、精致、有辨识度的商业软件界面，避免课程作业、PPT 或 AI Demo 式页面。
 - 全站保持统一设计语言；少文字、少装饰、强层级、高一致性。优先通过布局、留白和视觉层级表达信息，不为了炫技牺牲体验。
-- UI 优先使用 shadcn/ui（Nova 风格），图标使用 Lucide；仅在确有需求时使用 Motion、react-resizable-panels、dnd-kit、Zustand，不为了使用依赖而增加功能。
+- React UI 库统一使用 **Taro UI for React**，替代此前 shadcn/ui 的选型要求；图标使用 Lucide；仅在确有需求时使用 Motion、react-resizable-panels、dnd-kit、Zustand，不为了使用依赖而增加功能。
 - 优先复用现有组件，保持组件源码可控；不重复引入功能相同的依赖，也不重新开发已有能力。
 
 ### 6.2 视觉与排版
+
+- 中文字体仅使用系统默认中文字体或微软雅黑（`Microsoft YaHei`），不引入其他中文字体。英文使用 Times New Roman（`Times New Roman`）；中英文混排通过字体回退分别显示。所有页面、表单和公共组件遵循同一字体规则。系统缺少指定字体时使用系统可用字体，不擅自下载或提交字体文件。
 
 - 统一字体、字号层级、颜色、间距、圆角、阴影、组件样式和交互状态。
 - 正文默认字号为 20–22 CSS px，重要信息为 22–26 CSS px；提供大字模式，并支持随系统或浏览器字号调整。文字放大至 200% 后，页面仍须可阅读、可操作。
