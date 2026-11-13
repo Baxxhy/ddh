@@ -8,17 +8,17 @@ export default defineConfig(({ mode }) => {
   envDir: '..',
   resolve: { alias: [{ find: /^@tarojs\/components$/, replacement: fileURLToPath(new URL('./src/components/taro-h5.ts', import.meta.url)) }] },
   plugins: [react(), {
-    name: 'require-frontend-port-5173',
+    name: 'require-frontend-port-5200',
     configResolved(config) {
-      if (config.server.port !== 5173 || config.preview.port !== 5173) {
-        throw new Error('点点会前端只允许使用 5173 端口。')
+      if (config.server.port !== 5200 || config.preview.port !== 5200) {
+        throw new Error('点点会前端只允许使用 5200 端口。')
       }
     },
   }],
-  preview: { host: env.VITE_HOST || '::', port: 5173, strictPort: true },
+  preview: { host: env.VITE_HOST || '::', port: 5200, strictPort: true },
   server: {
     host: env.VITE_HOST || '::',
-    port: 5173,
+    port: 5200,
     strictPort: true,
     proxy: {
       '/api': {
