@@ -2,7 +2,7 @@ from typing import Any
 
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Boolean, DateTime, Integer, JSON, String, Text
+from sqlalchemy import BigInteger, Boolean, DateTime, Index, Integer, JSON, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -26,6 +26,8 @@ class ScenarioVersion(Base):
 
 class PracticeSession(Base):
     __tablename__ = "practice_sessions"
+    # Explicit index name matches Alembic.
+    __table_args__ = (Index("ix_practice_expires", "expires_at"),)
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
@@ -36,6 +38,7 @@ class PracticeSession(Base):
     return_stack_json: Mapped[list[Any]] = mapped_column(JSON, nullable=False)
     revision: Mapped[int] = mapped_column(Integer, nullable=False)
     result_json: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    closed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
@@ -52,3 +55,9 @@ class KnowledgeChunk(Base):
     keywords_json: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     version: Mapped[str] = mapped_column(String(16), nullable=False)
     active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+
+class ScenarioCurrent(Base):
+    __tablename__ = 'scenario_current'
+    scenario_id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    version: Mapped[str] = mapped_column(String(16), nullable=False)
