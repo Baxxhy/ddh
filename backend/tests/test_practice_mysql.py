@@ -132,3 +132,17 @@ def test_explicit_current_and_pinned_history(client,mysql):
   assert client.get('/api/v1/practice/state',headers=headers).json()['scenarioVersion']=='2.0'
  finally:
   with Session(mysql) as db:db.get(ScenarioCurrent,'hospital').version='2.0';db.commit()
+
+
+def test_invalid_contract_and_foreign_options(client):
+ assert client.post('/api/v1/practice/sessions',json={'scenarioId':'unknown'}).status_code==404
+ headers,state=create(client,'hospital')
+ assert client.post('/api/v1/practice/actions',headers=headers,json={'revision':-1,'actionId':'open_registration'}).status_code==422
+ state=move(client,headers,state,'open_registration')
+ state=move(client,headers,state,'select_hospital','a')
+ move(client,headers,state,'select_department','b-internal',422)
+ state=move(client,headers,state,'select_department','a-internal')
+ move(client,headers,state,'select_doctor','a-surgery-general',422)
+ state=move(client,headers,state,'select_doctor','a-internal-general')
+ move(client,headers,state,'select_slot','a-internal-special-am',422)
+ assert client.get('/api/v1/practice/state',headers=headers).json()['revision']==state['revision']

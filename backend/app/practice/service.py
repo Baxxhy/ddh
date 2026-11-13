@@ -44,6 +44,7 @@ def view(row: PracticeSession, config: dict, feedback: str | None = None) -> dic
 
 
 def create(db: Session, scenario: str) -> dict:
+    if scenario not in engine.START: raise PracticeError(404, 'SCENARIO_NOT_FOUND', '场景不存在，请返回首页选择。')
     current = db.get(ScenarioCurrent, scenario)
     version = db.get(ScenarioVersion, (scenario,current.version)) if current else None
     if version is None or not version.active: raise PracticeError(404, 'SCENARIO_NOT_FOUND', '场景不存在，请返回首页选择。')

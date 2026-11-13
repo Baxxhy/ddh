@@ -53,3 +53,39 @@ def test_payment_wrong_merchant_and_amount_recovery():
  with pytest.raises(RuleError):transition('payment',state,config,'confirm_payment')
  state=transition('payment',state,config,'edit_amount');state=transition('payment',state,config,'set_amount','12.50')
  assert transition('payment',state,config,'confirm_payment')['result']
+
+
+@pytest.mark.parametrize('edit,action,value,remaining',[
+ ('edit_department','select_department','a-surgery',{'hospital','department'}),
+ ('edit_doctor','select_doctor','a-internal-special',{'hospital','department','doctor'}),
+ ('edit_slot','select_slot','a-internal-general-pm',{'hospital','department','doctor','slot'}),
+])
+def test_changing_each_parent_clears_only_dependencies(edit,action,value,remaining):
+ config=demo_config('hospital');state=initial('hospital')
+ for a,v in PATHS['hospital'][:-1]:state=transition('hospital',state,config,a,v)
+ state=transition('hospital',state,config,edit)
+ state=transition('hospital',state,config,action,value)
+ assert set(state['selections'])==remaining
+ assert state['selections'][action[7:]]==value
+
+
+@pytest.mark.parametrize('scene',PATHS)
+def test_cannot_confirm_or_forge_at_start(scene):
+ config=demo_config(scene);state=initial(scene)
+ with pytest.raises(RuleError): transition(scene,state,config,PATHS[scene][-1][0])
+ assert state==initial(scene)
+
+
+@pytest.mark.parametrize('hospital,department,doctor,slot',[
+ ('b','b-internal','b-internal-general','b-internal-general-am'),
+ ('a','a-surgery','a-surgery-general','a-surgery-general-am'),
+ ('a','a-internal','a-internal-special','a-internal-special-am'),
+ ('a','a-internal','a-internal-general','a-internal-general-pm'),
+])
+def test_each_wrong_target_can_be_repaired(hospital,department,doctor,slot):
+ config=demo_config('hospital');state=initial('hospital')
+ for action,value in [('open_registration',None),('select_hospital',hospital),('select_department',department),('select_doctor',doctor),('select_slot',slot)]:state=transition('hospital',state,config,action,value)
+ with pytest.raises(RuleError):transition('hospital',state,config,'confirm_registration')
+ state=transition('hospital',state,config,'edit_hospital')
+ for action,value in PATHS['hospital'][1:]:state=transition('hospital',state,config,action,value)
+ assert state['result']

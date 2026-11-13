@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class CreateRequest(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    scenarioId: Literal['hospital','bus','payment']
+    scenarioId: str = Field(min_length=1, max_length=32)
 
 
 class RevisionRequest(BaseModel):

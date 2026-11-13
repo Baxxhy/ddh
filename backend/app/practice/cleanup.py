@@ -8,7 +8,7 @@ from backend.app.practice.service import now
 
 def cleanup(db: Session, limit: int = 500) -> int:
     ids = list(db.scalars(select(PracticeSession.id).where(or_(PracticeSession.expires_at <= now(), PracticeSession.closed_at.is_not(None))).limit(limit)))
-    if ids: db.execute(delete(PracticeSession).where(PracticeSession.id.in_(ids)))
+    if ids: db.execute(delete(PracticeSession).where(PracticeSession.id.in_(ids), or_(PracticeSession.expires_at <= now(), PracticeSession.closed_at.is_not(None))))
     db.commit()
     return len(ids)
 

@@ -1,3 +1,8 @@
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from backend.app.practice.api import router as practice_router
+from backend.app.practice.service import PracticeError
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
@@ -59,11 +64,6 @@ def scenario_detail(scenario_id: str, db: Session = Depends(get_db)) -> Scenario
                           goal=row.goal, version=row.version, simulation_notice=row.simulation_notice)
 
 
-from fastapi import Request
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from backend.app.practice.api import router as practice_router
-from backend.app.practice.service import PracticeError
 
 app.include_router(practice_router)
 
