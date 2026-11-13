@@ -81,3 +81,21 @@ p { font-size: 1.25rem; line-height: 1.6; margin: 0; }
 .result-summary > p { margin-block: 18px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
 @media (max-width: 380px) { .app-shell { padding-inline: 16px; } .scenario-item { grid-template-columns: 38px minmax(0,1fr) 18px; gap: 10px; padding-inline: 12px; } .scenario-icon { width: 38px; height: 44px; } }
+.practice-task { padding: 16px; border-left: 4px solid var(--primary); border-radius: 4px 12px 12px 4px; background: var(--info-bg); }
+.practice-task summary { font-size: 1.25rem; font-weight: bold; line-height: 1.6; min-height: 44px; cursor: pointer; }
+.practice-task p { margin-top: 4px; }
+.loading-message { margin-top: 16px; }
+.hospital { --scene: #22577b; --scene-bg: #eaf2f8; }
+.bus { --scene: #245b3d; --scene-bg: #e8f2e9; }
+.payment { --scene: #754b12; --scene-bg: #faf0df; }
+.service-welcome { display: flex; align-items: center; gap: 16px; padding-block: 12px; color: var(--scene); }
+.service-welcome svg { flex-shrink: 0; }
+.option-content { display: flex; align-items: center; gap: 14px; text-align: left; }
+.option-content > span:not(.option-icon) { flex: 1; min-width: 0; }
+.option-icon { display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 40px; color: var(--scene); }
+.selection-check { flex-shrink: 0; color: var(--primary); }
+.section-title { margin-top: 24px; }
+.department-options [role="group"] { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.department-options .option-content { flex-wrap: wrap; }
+.time-options .option-row { border-left: 4px solid var(--scene); }
+.simulation-content .practice-actions { margin-bottom: 0; }
