@@ -89,3 +89,49 @@ def test_each_wrong_target_can_be_repaired(hospital,department,doctor,slot):
  state=transition('hospital',state,config,'edit_hospital')
  for action,value in PATHS['hospital'][1:]:state=transition('hospital',state,config,action,value)
  assert state['result']
+
+
+@pytest.mark.parametrize('edit,action,value,node',[
+ ('edit_hospital','select_hospital','a','H2'),
+ ('edit_hospital','select_hospital','b','H2'),
+ ('edit_department','select_department','a-internal','H3'),
+ ('edit_department','select_department','a-surgery','H3'),
+ ('edit_doctor','select_doctor','a-internal-general','H4'),
+ ('edit_doctor','select_doctor','a-internal-special','H4'),
+ ('edit_slot','select_slot','a-internal-general-am','H5'),
+ ('edit_slot','select_slot','a-internal-general-pm','H5'),
+])
+def test_reselect_and_continuous_back_has_no_forward_history(edit,action,value,node):
+ config=demo_config('hospital');state=initial('hospital')
+ for a,v in PATHS['hospital'][:-1]:state=transition('hospital',state,config,a,v)
+ before=state['selections'].copy()
+ state=transition('hospital',state,config,edit)
+ state=transition('hospital',state,config,action,value)
+ assert state['nodeId']==node
+ if before[action[7:]]==value: assert state['selections']==before
+ expected=[f'H{i}' for i in reversed(range(int(node[1])))]
+ visited=[]
+ while state['returnStack']:
+  state=back(state);visited.append(state['nodeId'])
+ assert visited==expected
+ assert len(visited)==len(set(visited))
+
+
+@pytest.mark.parametrize('merchant',['a','b'])
+def test_payment_reselect_then_continuous_back(merchant):
+ config=demo_config('payment');state=initial('payment')
+ for action,value in PATHS['payment'][:-1]:state=transition('payment',state,config,action,value)
+ state=transition('payment',state,config,'edit_merchant')
+ state=transition('payment',state,config,'scan_demo_code',merchant)
+ assert state['selections'].get('amount_fen')==(1250 if merchant=='a' else None)
+ state=back(state);assert state['nodeId']=='P1'
+ state=back(state);assert state['nodeId']=='P0' and not state['returnStack']
+
+
+def test_edit_amount_navigation_and_legacy_stack():
+ config=demo_config('payment');state=initial('payment')
+ for action,value in PATHS['payment'][:-1]:state=transition('payment',state,config,action,value)
+ state=transition('payment',state,config,'edit_amount')
+ assert back(state)['nodeId']=='P2'
+ state['returnStack']=[{'nodeId':'P4'},{'nodeId':'P3'}]
+ assert back(state)['nodeId']=='P2'

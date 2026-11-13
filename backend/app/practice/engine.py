@@ -80,14 +80,11 @@ def transition(scenario: str, state: dict, config: dict, action: str, value: obj
         dependencies = ['hospital','department','doctor','slot']
         if selections.get(key) != value:
             for child in dependencies[dependencies.index(key)+1:]: selections.pop(child, None)
-            allowed = ['H0','H1','H2','H3','H4'][:dependencies.index(key)+2]
-            state['returnStack'] = [x for x in state['returnStack'] if x['nodeId'] in allowed]
         selections[key] = value
         destination = 'H' + str(int(node[1])+1)
     elif action == 'scan_demo_code':
         if selections.get('merchant') != value:
             selections.pop('amount_fen', None)
-            state['returnStack'] = [x for x in state['returnStack'] if x['nodeId'] in ['P0','P1']]
         selections['merchant'] = value
         destination = 'P2'
     elif action == 'set_amount':
@@ -111,13 +108,25 @@ def transition(scenario: str, state: dict, config: dict, action: str, value: obj
         destination = {'open_registration':'H1','open_travel':'B1','open_transport':'B2','choose_bus':'B3','choose_metro':'BM','open_bus_code':'B4','align_and_scan':'B6','open_scan':'P1','continue_to_amount':'P3'}.get(action)
         if action == 'other_service': destination = {'hospital':'HX','bus':'BX','payment':'PX'}[scenario]
         if action == 'align_and_scan': state['result'] = {'message': NOTICES[scenario], 'selections': {}}
-    state['returnStack'] = (state['returnStack'] + [{'nodeId': node}])[-20:]
+    # Hospital/payment navigation is a linear page hierarchy, independent of
+    # whether a choice changed. Editing discards the old forward path only.
+    path = navigation_path(destination)
+    state['returnStack'] = path if path is not None else (state['returnStack'] + [{'nodeId': node}])[-20:]
     state['nodeId'] = destination
     return state
 
 
+def navigation_path(node: str) -> list[dict] | None:
+    for pages in [['H0','H1','H2','H3','H4','H5','H6'], ['P0','P1','P2','P3','P4','P5']]:
+        if node in pages:
+            return [{'nodeId': page} for page in pages[:pages.index(node)]]
+    return None
+
+
 def back(state: dict) -> dict:
     state = deepcopy(state)
+    path = navigation_path(state['nodeId'])
+    if path is not None: state['returnStack'] = path
     if state['result'] or not state['returnStack']: raise RuleError('当前页面不能返回，请重新开始或返回首页。')
     state['nodeId'] = state['returnStack'].pop()['nodeId']
     return state
